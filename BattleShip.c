@@ -27,7 +27,7 @@ void printBoard(int r, int c, char board[r][c]){
 
 int isValidPlace(int x, int y, int size, int r, int c, char orient, char playBoard[r][c]){
     int i;
-    if (orient == 'h' && y+size <= c && y >= 0 && x < r && x >= 0){
+    if (orient == 'h' && y+size <= c && y >= 0 && x < r && x >= 0 && playBoard[x][y] == '?'){
         for(i = 0; i < size; i++){
             if (playBoard[x+i][y] == 'x'){
                 return(0);
@@ -38,7 +38,7 @@ int isValidPlace(int x, int y, int size, int r, int c, char orient, char playBoa
             }
         }
     }
-    else if (orient == 'v' && y < c && y >= 0 && x+size <= r && x >= 0){
+    else if (orient == 'v' && y < c && y >= 0 && x+size <= r && x >= 0 && playBoard[x][y] == '?'){
         for(i = 0; i < size; i++){
             if (playBoard[x][y+i] == 'x'){
                 return(0);
@@ -54,7 +54,7 @@ int isValidPlace(int x, int y, int size, int r, int c, char orient, char playBoa
 
 void placeShipVert(int x, int y, int size, int r, int c, char playBoard[r][c]){
     for (int i = 0; i < size; i++){ //Has to fit ship, depending on size
-        playBoard[x+i][y] = 'x';
+        playBoard[x+i][y] = size + 48; //int to char of same value via ASCII
     }
     system("cls"); 
     printBoard(r, c, playBoard);
@@ -62,7 +62,7 @@ void placeShipVert(int x, int y, int size, int r, int c, char playBoard[r][c]){
 
 void placeShipHoriz(int x, int y, int size, int r, int c, char playBoard[r][c]){
     for (int i = 0; i < size; i++){ //Has to fit ship, depending on size
-        playBoard[x][y+i] = 'x';
+        playBoard[x][y+i] = size + 48; //int to char of same value via ASCII
     }
     system("cls"); 
     printBoard(r, c, playBoard);
@@ -102,23 +102,23 @@ void setBoard(int p, int num, int size, int r, int c, char playBoard[r][c]){
 }
 
 int checkHit(int x, int y, int r, int c, char hidBoard[r][c], char playBoard[r][c]){
-            hidBoard[x][y] = 'x';
-            if (hidBoard[x][y] != playBoard[x][y]){
-                hidBoard[x][y] = 'o';
-                system("cls");
-                printBoard(r, c, hidBoard);
-                printf("\nMiss"); //if miss
-                sleep(3);
-                system("cls");
-                return(0);
-            } else {
-                system("cls");
-                printBoard(r, c, hidBoard);
-                printf("\nHit");
-                sleep(3);
-                system("cls");
-                return(1);
-            }
+    if (playBoard[x][y] == '?'){
+        hidBoard[x][y] = 'o';
+        system("cls");
+        printBoard(r, c, hidBoard);
+        printf("\nMiss"); //if miss
+        sleep(3);
+        system("cls");
+        return(0);
+    } else {
+        hidBoard[x][y] = 'x';
+        system("cls");
+        printBoard(r, c, hidBoard);
+        printf("\nHit");
+        sleep(3);
+        system("cls");
+        return(1);
+    }
 }
 
 int isValidMove(int x, int y, int r, int c, char hidBoard[r][c]){
@@ -167,6 +167,7 @@ int checkWin(int hits, int shipTotal){
 int main(){ //10 by 10, with 10 ships.
     int ships[10] = {2,2,2,2,3,3,3,4,4,5}, player = 1, turns, i, j, win, totalShips = 0, hits1 = 0, hits2 = 0;
     char setUp[rows][cols], hiddenBoard1[rows][cols], hiddenBoard2[rows][cols], board1[rows][cols], board2[rows][cols], ready;
+    
     //Create boards based on size of rows and cols, rather than being set
     for (i = 0; i < rows; i++){
         for (j = 0; j < cols; j++){
@@ -231,8 +232,8 @@ int main(){ //10 by 10, with 10 ships.
             }
         }
     }
-    
     printf("Winner is Player: %d", player);
     sleep(3);
     return(0);
 }
+
